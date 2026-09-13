@@ -59,20 +59,6 @@
                 </div>
             </form>
 
-            <!-- Quick Demo Credentials Info Box -->
-            <div class="mt-6 pt-6 border-t border-slate-100">
-                <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Akun Demo (Development):</h4>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5 text-slate-700">
-                    <div class="flex justify-between items-center">
-                        <span><strong>Admin:</strong> admin@example.com</span>
-                        <span class="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">password</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span><strong>HRD:</strong> hrd@example.com</span>
-                        <span class="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">password</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="text-center mt-6">
