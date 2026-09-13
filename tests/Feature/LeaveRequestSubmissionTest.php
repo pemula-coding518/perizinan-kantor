@@ -212,9 +212,9 @@ class LeaveRequestSubmissionTest extends TestCase
         $responseSuccess->assertSessionHasNoErrors();
     }
 
-    public function test_emergency_leave_today_before_08_00_wib_succeeds(): void
+    public function test_emergency_leave_today_at_08_29_59_wib_succeeds(): void
     {
-        Carbon::setTestNow(Carbon::create(2026, 9, 8, 7, 45, 0, 'Asia/Jakarta'));
+        Carbon::setTestNow(Carbon::create(2026, 9, 8, 8, 29, 59, 'Asia/Jakarta'));
 
         $response = $this->post('/ajukan-izin', [
             'name' => 'Fani',
@@ -236,9 +236,9 @@ class LeaveRequestSubmissionTest extends TestCase
         ]);
     }
 
-    public function test_emergency_leave_today_exactly_at_08_00_00_wib_succeeds(): void
+    public function test_emergency_leave_today_exactly_at_08_30_00_wib_succeeds(): void
     {
-        Carbon::setTestNow(Carbon::create(2026, 9, 8, 8, 0, 0, 'Asia/Jakarta'));
+        Carbon::setTestNow(Carbon::create(2026, 9, 8, 8, 30, 0, 'Asia/Jakarta'));
 
         $response = $this->post('/ajukan-izin', [
             'name' => 'Fani',
@@ -254,9 +254,9 @@ class LeaveRequestSubmissionTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
-    public function test_emergency_leave_after_08_00_00_wib_is_rejected(): void
+    public function test_emergency_leave_at_08_30_01_wib_is_rejected(): void
     {
-        Carbon::setTestNow(Carbon::create(2026, 9, 8, 8, 0, 1, 'Asia/Jakarta'));
+        Carbon::setTestNow(Carbon::create(2026, 9, 8, 8, 30, 1, 'Asia/Jakarta'));
 
         $response = $this->from('/ajukan-izin')->post('/ajukan-izin', [
             'name' => 'Fani',

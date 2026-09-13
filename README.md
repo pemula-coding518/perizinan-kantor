@@ -58,7 +58,7 @@ Seluruh validasi waktu mengacu pada zona waktu resmi kantor: **WIB (`Asia/Jakart
 | **Izin Terlambat** | `late` | Wajib Hari H (`today`) | Normal: &le; 07.00 WIB | Lewat 07.00 WIB: **Wajib Darurat** + Alasan Darurat | Opsional |
 | **Izin Setengah Hari** | `half_day` | Minimal **H-1** (mulai besok) | - | - | Opsional |
 | **Cuti** | `leave` | Minimal **H-7** | - | - | Opsional |
-| **Izin Darurat** | `emergency` | Wajib Hari H (`today`) | Maksimal **08.00.00 WIB** | Tipe izin inheren darurat (*Alasan wajib*) | Opsional |
+| **Izin Darurat** | `emergency` | Wajib Hari H (`today`) | Maksimal **08.30.00 WIB** | Tipe izin inheren darurat (*Alasan wajib*) | Opsional |
 | **Izin Sakit** | `sick` | Hari H atau tanggal mendatang | Normal: < 08.30 WIB | Hari H &ge; 08.30 WIB: **Wajib Darurat** + Alasan Darurat | **Wajib** surat dokter jika > 1 hari |
 
 ### Detail Aturan Spesifik:
@@ -77,7 +77,7 @@ Seluruh validasi waktu mengacu pada zona waktu resmi kantor: **WIB (`Asia/Jakart
 4. **Izin Darurat (`emergency`)**:
    - Menggantikan izin pribadi reguler.
    - **Hanya dapat diajukan untuk Hari H** (`today` Asia/Jakarta). Tidak ada pengajuan mundur maupun tanggal mendatang.
-   - **Batas waktu submit maksimal pukul 08.00.00 WIB**. Pengajuan pada `08:00:01` WIB ke atas otomatis ditolak oleh validasi server.
+   - **Batas waktu submit maksimal pukul 08.30.00 WIB**. Pengajuan pada `08:30:01` WIB ke atas otomatis ditolak oleh validasi server.
    - Alasan kondisi darurat wajib diisi.
    - Tidak memerlukan checkbox darurat terpisah karena tipe izin ini secara inheren merupakan izin darurat.
 5. **Izin Sakit (`sick`)**:
@@ -413,7 +413,7 @@ Environment PHPUnit memakai kredensial Telegram dummy dan HTTP client yang di-*f
 
 ### Cakupan Pengujian (40 Tests / 153 Assertions):
 - **Otentikasi & Keamanan Akses**: Uji login admin/hrd, proteksi kredensial tidak valid, pembatasan middleware role antar dashboard, proteksi logout, dan rute tamu.
-- **Validasi 5 Jenis Izin**: Uji alur pengajuan lengkap untuk izin terlambat (aturan 07.00 WIB & emergency), izin setengah hari (durasi jam & minimal H-1), cuti (minimal H-7), **izin darurat** (aturan batas 08.00 WIB hari H & penolakan tipe lama `personal`), dan izin sakit (aturan jam 08.30 WIB & kewajiban surat dokter > 1 hari).
+- **Validasi 5 Jenis Izin**: Uji alur pengajuan lengkap untuk izin terlambat (aturan 07.00 WIB & emergency), izin setengah hari (durasi jam & minimal H-1), cuti (minimal H-7), **izin darurat** (aturan batas 08.30 WIB hari H & penolakan tipe lama `personal`), dan izin sakit (aturan jam 08.30 WIB & kewajiban surat dokter > 1 hari).
 - **Validasi Standarisasi Jabatan**: Uji penerimaan seluruh 12 opsi allow-list jabatan dan penolakan nilai input jabatan di luar daftar.
 - **Notifikasi Telegram**: Uji trigger pengiriman post-commit melalui HTTP fake, proteksi data jika pengiriman gagal (tanpa rollback DB), sanitasi karakter HTML/anti-leak, dan proteksi anti-duplikasi saat refresh halaman sukses.
 - **Alur Persetujuan & Konkurensi**: Uji aksi approval dengan catatan, penolakan dengan alasan wajib, row-level lock concurrency, dan pembentukan URL WhatsApp Click-to-Chat.

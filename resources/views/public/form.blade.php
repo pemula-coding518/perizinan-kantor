@@ -12,6 +12,7 @@
         tomorrowDate: '{{ \Carbon\Carbon::tomorrow('Asia/Jakarta')->toDateString() }}',
         minLeaveDate: '{{ \Carbon\Carbon::now('Asia/Jakarta')->addDays(7)->toDateString() }}',
         currentTime: '{{ \Carbon\Carbon::now('Asia/Jakarta')->format('H:i') }}',
+        currentTimeWithSeconds: '{{ \Carbon\Carbon::now('Asia/Jakarta')->format('H:i:s') }}',
         selectedFiles: [],
         
         get calculatedHalfDayHours() {
@@ -28,8 +29,8 @@
             return this.currentTime > '07:00';
         },
 
-        get isPast8Am() {
-            return this.currentTime > '08:00';
+        get isPastEmergencyDeadline() {
+            return this.currentTimeWithSeconds > '08:30:00';
         },
 
         get isPast830Am() {
@@ -408,16 +409,16 @@
                     <div class="bg-amber-50 border-l-4 border-amber-500 p-3 text-xs text-amber-900 rounded-r">
                         <strong>Ketentuan Izin Darurat:</strong>
                         <ul class="list-disc list-inside mt-1 space-y-0.5">
-                            <li>Izin Darurat hanya dapat diajukan pada hari yang sama dan maksimal pukul <strong>08.00 WIB</strong>.</li>
+                            <li>Izin Darurat hanya dapat diajukan pada hari yang sama dan maksimal pukul <strong>08.30 WIB</strong>.</li>
                             <li>Tipe izin ini merepresentasikan kondisi darurat/mendesak tanpa perlu memilih opsi terpisah.</li>
                         </ul>
                     </div>
 
-                    <div x-show="isPast8Am" class="p-3 bg-rose-50 border border-rose-300 rounded-lg text-xs text-rose-900 flex items-center">
+                    <div x-show="isPastEmergencyDeadline" class="p-3 bg-rose-50 border border-rose-300 rounded-lg text-xs text-rose-900 flex items-center">
                         <svg class="w-5 h-5 text-rose-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        <span>Waktu saat ini telah melewati pukul 08.00 WIB. Pengajuan Izin Darurat akan ditolak oleh sistem.</span>
+                        <span>Waktu saat ini telah melewati pukul 08.30 WIB. Pengajuan Izin Darurat akan ditolak oleh sistem.</span>
                     </div>
 
                     <div>

@@ -15,6 +15,8 @@ class ExampleTest extends TestCase
         $response->assertRedirect('/ajukan-izin');
 
         $formResponse = $this->get('/ajukan-izin');
-        $formResponse->assertStatus(200);
+        $formResponse->assertSee('Izin Darurat hanya dapat diajukan pada hari yang sama dan maksimal pukul')
+            ->assertSee('08.30 WIB')
+            ->assertDontSee('08.00 WIB');
     }
 }

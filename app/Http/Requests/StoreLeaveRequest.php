@@ -129,13 +129,13 @@ class StoreLeaveRequest extends FormRequest
                     $validator->errors()->add('reason', 'Alasan cuti wajib diisi.');
                 }
             } elseif ($type === 'emergency') {
-                // Izin Darurat (Hari H only, max 08:00:00 WIB)
+                // Izin Darurat (Hari H only, max 08:30:00 WIB)
                 if ($leaveDate !== $today) {
                     $validator->errors()->add('leave_date', 'Izin darurat hanya dapat diajukan untuk tanggal hari ini.');
                 }
 
-                if ($now->format('H:i:s') > '08:00:00') {
-                    $validator->errors()->add('type', 'Pengajuan izin darurat maksimal diajukan pukul 08.00 WIB.');
+                if ($now->format('H:i:s') > '08:30:00') {
+                    $validator->errors()->add('type', 'Pengajuan izin darurat maksimal diajukan pukul 08.30 WIB.');
                 }
 
                 if (empty(trim((string) $this->input('reason')))) {
