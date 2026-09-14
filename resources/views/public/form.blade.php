@@ -7,6 +7,7 @@
         emergency: {{ old('emergency') ? 'true' : 'false' }},
         startTime: '{{ old('start_time', '08:30') ?: '08:30' }}',
         endTime: '{{ old('end_time', '12:30') ?: '12:30' }}',
+        estimatedArrival: '{{ old('estimated_arrival', '08:45') ?: '08:45' }}',
         sickDuration: {{ is_numeric(old('duration')) ? (float) old('duration') : 1 }},
         todayDate: '{{ \Carbon\Carbon::now('Asia/Jakarta')->toDateString() }}',
         tomorrowDate: '{{ \Carbon\Carbon::tomorrow('Asia/Jakarta')->toDateString() }}',
@@ -23,6 +24,14 @@
             const endMinutes = eh * 60 + em;
             if (endMinutes <= startMinutes) return 0;
             return ((endMinutes - startMinutes) / 60).toFixed(1);
+        },
+
+        get isHalfDayDurationTooLong() {
+            return this.calculatedHalfDayHours > 4;
+        },
+
+        get isLateConvertedToHalfDay() {
+            return this.estimatedArrival > '09:30';
         },
         
         get isPast7Am() {
@@ -211,7 +220,8 @@
                             <li>Hanya berlaku untuk tanggal hari ini.</li>
                             <li>Batas pengajuan normal maksimal pukul <strong>07.00 WIB</strong>.</li>
                             <li>Setelah pukul 07.00 WIB hanya diizinkan untuk kondisi darurat.</li>
-                            <li>Estimasi kedatangan maksimal pukul <strong>09.30 WIB</strong>.</li>
+                            <li>Sampai pukul <strong>09.30 WIB</strong> diproses sebagai izin terlambat.</li>
+                            <li>Setelah pukul <strong>09.30 WIB</strong> otomatis diproses sebagai izin setengah hari.</li>
                         </ul>
                     </div>
 
@@ -229,13 +239,18 @@
                             <label for="estimated_arrival" class="block text-sm font-medium text-slate-700 mb-1">
                                 Estimasi Jam Kedatangan <span class="text-rose-500">*</span>
                             </label>
-                            <input type="time" id="estimated_arrival" name="estimated_arrival" max="09:30"
+                            <input type="time" id="estimated_arrival" name="estimated_arrival" x-model="estimatedArrival"
                                 value="{{ old('estimated_arrival', '08:45') }}"
                                 :disabled="type !== 'late'" {{ old('type', 'late') !== 'late' ? 'disabled' : '' }}
                                 class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-slate-900 focus:ring-2 focus:ring-indigo-600 text-sm">
-                            <p class="text-xs text-slate-700 mt-1">Maksimal pukul 09.30 WIB.</p>
+                            <p class="text-xs text-slate-700 mt-1">Setelah 09.30 WIB, pengajuan disimpan sebagai izin setengah hari.</p>
                             @error('estimated_arrival') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                         </div>
+                    </div>
+
+                    <div x-show="isLateConvertedToHalfDay"
+                         class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+                        Pengajuan ini akan diproses sebagai <strong>Izin Setengah Hari</strong> dengan rentang 08.30 WIB sampai estimasi kedatangan.
                     </div>
 
                     <!-- Emergency trigger if after 07.00 -->
@@ -286,7 +301,7 @@
                         <strong>Ketentuan Izin Setengah Hari:</strong>
                         <ul class="list-disc list-inside mt-1 space-y-0.5">
                             <li>Pengajuan minimal <strong>H-1</strong> (tanggal izin mulai besok).</li>
-                            <li>Ketidakhadiran sekitar <strong>4 jam kerja</strong> dari total jam kerja harian.</li>
+                            <li>Durasi izin maksimal <strong>4 jam</strong>.</li>
                         </ul>
                     </div>
 
@@ -343,9 +358,9 @@
                         <span class="font-bold text-sm text-indigo-700" x-text="calculatedHalfDayHours + ' Jam'"></span>
                     </div>
 
-                    <div x-show="calculatedHalfDayHours > 0 && (calculatedHalfDayHours < 3 || calculatedHalfDayHours > 5)"
-                         class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                        ⚠️ <strong>Peringatan Durasi:</strong> Durasi (<span x-text="calculatedHalfDayHours"></span> jam) terpaut jauh dari standar setengah hari kerja (±4 jam kerja). Pengajuan tetap dapat dikirim namun akan ditinjau oleh HRD/Admin.
+                    <div x-show="isHalfDayDurationTooLong"
+                         class="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800">
+                        ⚠️ <strong>Durasi tidak valid:</strong> Durasi izin setengah hari maksimal 4 jam. Pengajuan lebih dari 4 jam tidak diperbolehkan.
                     </div>
 
                     <div>
@@ -587,8 +602,9 @@
                     &larr; Sudah pernah mengajukan? Cek status di sini
                 </a>
 
-                <button type="submit"
-                    class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 border border-transparent rounded-xl shadow-md text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition order-1 sm:order-2 cursor-pointer">
+                <button type="submit" :disabled="type === 'half_day' && isHalfDayDurationTooLong"
+                    :class="type === 'half_day' && isHalfDayDurationTooLong ? 'bg-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 border border-transparent rounded-xl shadow-md text-base font-semibold text-white focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition order-1 sm:order-2">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>

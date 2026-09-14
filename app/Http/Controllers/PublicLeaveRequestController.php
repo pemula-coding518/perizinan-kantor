@@ -36,6 +36,14 @@ class PublicLeaveRequestController extends Controller
         $validated = $request->validated();
 
         $type = $validated['type'];
+
+        if ($type === 'late' && ($validated['estimated_arrival'] ?? null) > '09:30') {
+            $type = 'half_day';
+            $validated['start_time'] = '08:30';
+            $validated['end_time'] = $validated['estimated_arrival'];
+            $validated['half_day_type'] = 'Datang terlambat';
+        }
+
         $duration = null;
 
         if ($type === 'half_day' && ! empty($validated['start_time']) && ! empty($validated['end_time'])) {

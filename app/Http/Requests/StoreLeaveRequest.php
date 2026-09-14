@@ -71,8 +71,13 @@ class StoreLeaveRequest extends FormRequest
                 $arrival = $this->input('estimated_arrival');
                 if (empty($arrival)) {
                     $validator->errors()->add('estimated_arrival', 'Estimasi jam kedatangan wajib diisi.');
-                } elseif ($arrival > '09:30') {
-                    $validator->errors()->add('estimated_arrival', 'Estimasi kedatangan maksimal adalah pukul 09.30 WIB.');
+                } elseif ($arrival > '09:30' && ! $validator->errors()->has('estimated_arrival')) {
+                    $arrivalTime = Carbon::createFromFormat('H:i', $arrival);
+                    $workStartTime = Carbon::createFromFormat('H:i', '08:30');
+
+                    if (abs($arrivalTime->diffInMinutes($workStartTime)) > 240) {
+                        $validator->errors()->add('estimated_arrival', 'Durasi izin setengah hari maksimal 4 jam. Pengajuan lebih dari 4 jam tidak diperbolehkan.');
+                    }
                 }
 
                 if (empty(trim((string) $this->input('reason')))) {
@@ -114,6 +119,20 @@ class StoreLeaveRequest extends FormRequest
 
                 if ($startTime && $endTime && $endTime <= $startTime) {
                     $validator->errors()->add('end_time', 'Jam selesai izin harus lebih besar daripada jam mulai.');
+                }
+
+                if (
+                    $startTime
+                    && $endTime
+                    && $endTime > $startTime
+                    && ! $validator->errors()->hasAny(['start_time', 'end_time'])
+                ) {
+                    $start = Carbon::createFromFormat('H:i', $startTime);
+                    $end = Carbon::createFromFormat('H:i', $endTime);
+
+                    if (abs($end->diffInMinutes($start)) > 240) {
+                        $validator->errors()->add('end_time', 'Durasi izin setengah hari maksimal 4 jam. Pengajuan lebih dari 4 jam tidak diperbolehkan.');
+                    }
                 }
 
                 if (empty(trim((string) $this->input('reason')))) {
